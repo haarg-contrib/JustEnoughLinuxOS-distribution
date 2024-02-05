@@ -11,25 +11,11 @@ ui_state() {
 
 if [ "${UI_SERVICE}" = "weston.service" ]
 then
-  if [ -f "${*}" ]
-  then
-    RUN=$(echo ${*} | sed 's# #\\ #g')
-    weston-terminal --command="${RUN}"
-  else
-    weston-terminal --command="${*}"
-  fi
+  weston-terminal --command="$(printf '%q ' "$@")"
 else
   ui_state stop
   clear >/dev/console
-  $* >/dev/console
-  if [ "$?" == 0 ]
-  then
-    ui_state start
-    exit 0
-  else
-    "$*" >/dev/console
-    ui_state start
-    exit 0
-  fi
+  "$@" >/dev/console
+  ui_state start
+  exit 0
 fi
-
